@@ -2,6 +2,7 @@
                 THUMB
                 EXPORT  ABS_ADD
                 EXPORT  BIG_SUB
+				EXPORT  STR_CMP_MAG 
                 IMPORT  STR_LEN
                 IMPORT  ARENA_ALLOC
 

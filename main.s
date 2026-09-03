@@ -1,4 +1,5 @@
-				AREA    |.text|, CODE, READONLY
+
+                AREA    |.text|, CODE, READONLY
                 THUMB
                 EXPORT  __main
                 IMPORT  UART_INIT
@@ -6,7 +7,7 @@
                 IMPORT  SHELL_READ_LINE
                 IMPORT  ARENA_INIT
                 IMPORT  STR_NORMALIZE
-                IMPORT  ABS_MUL
+                IMPORT  ABS_DIV
 
 __main
                 BL      UART_INIT
@@ -15,13 +16,14 @@ __main
                 LDR     R0, =Boot_Msg
                 BL      PRINT_STR
 
-                LDR     R0, =Num_12345
-                LDR     R1, =Num_99999
-                BL      ABS_MUL            
+                LDR     R0, =Num_987654
+                LDR     R1, =Num_12
+                BL      ABS_DIV            
                 
                 BL      PRINT_STR          
                 LDR     R0, =Newline_Msg
                 BL      PRINT_STR
+
 OS_Shell_Loop
                 LDR     R0, =Prompt_Msg
                 BL      PRINT_STR
@@ -46,8 +48,8 @@ OS_Shell_Loop
 CMD_Buffer      SPACE   64
 
                 AREA    |.rodata|, DATA, READONLY, ALIGN=2
-Num_12345       DCB     "12345", 0
-Num_99999       DCB     "99999", 0
+Num_987654      DCB     "987654", 0
+Num_12          DCB     "12", 0
 Boot_Msg        DCB     "StackOS v1.0 Initialized", 0x0D, 0x0A, 0
 Prompt_Msg      DCB     "StackOS> ", 0
 Echo_Msg        DCB     "Command: ", 0
