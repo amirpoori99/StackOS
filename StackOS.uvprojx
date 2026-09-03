@@ -414,6 +414,11 @@
               <FileType>2</FileType>
               <FilePath>.\math_basic.s</FilePath>
             </File>
+            <File>
+              <FileName>math_adv.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\math_adv.s</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
