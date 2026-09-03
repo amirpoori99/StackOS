@@ -399,6 +399,11 @@
               <FileType>2</FileType>
               <FilePath>.\shell_io.s</FilePath>
             </File>
+            <File>
+              <FileName>memory_core.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\memory_core.s</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

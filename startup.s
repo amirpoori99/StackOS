@@ -1,4 +1,3 @@
-				
 				AREA    STACK, NOINIT, READWRITE, ALIGN=3
 Stack_Mem       SPACE   0x400
 __initial_sp
