@@ -243,4 +243,122 @@ Result_Is_Zero
                 STRB    R1, [R0, #1]       
                 POP     {R4-R11, PC}
 
+SIGNED_ADD
+                PUSH    {R4-R9, LR}
+                MOV     R4, R0
+                MOV     R5, R1
+                MOV     R6, #0             
+                MOV     R7, #0             
+
+                LDRB    R2, [R4]
+                CMP     R2, #'-'
+                BNE     Add_Check_B
+                MOV     R6, #1
+                ADD     R4, R4, #1
+
+Add_Check_B
+                LDRB    R2, [R5]
+                CMP     R2, #'-'
+                BNE     Add_Route
+                MOV     R7, #1
+                ADD     R5, R5, #1
+
+Add_Route
+                CMP     R6, #0
+                BNE     Add_A_Neg
+
+                CMP     R7, #0
+                BNE     Add_Pos_Neg
+                MOV     R0, R4
+                MOV     R1, R5
+                BL      ABS_ADD
+                B       Add_End
+Add_Pos_Neg
+                MOV     R0, R4
+                MOV     R1, R5
+                BL      BIG_SUB
+                B       Add_End
+Add_A_Neg
+                CMP     R7, #0
+                BNE     Add_Neg_Neg
+                MOV     R0, R5
+                MOV     R1, R4
+                BL      BIG_SUB
+                B       Add_End
+Add_Neg_Neg
+                MOV     R0, R4
+                MOV     R1, R5
+                BL      ABS_ADD
+                LDRB    R2, [R0]
+                CMP     R2, #'0'
+                BNE     Add_Apply_Minus
+                LDRB    R2, [R0, #1]
+                CMP     R2, #0
+                BEQ     Add_End
+Add_Apply_Minus
+                SUB     R0, R0, #1
+                MOV     R2, #'-'
+                STRB    R2, [R0]
+Add_End
+                POP     {R4-R9, PC}
+
+SIGNED_SUB
+                PUSH    {R4-R9, LR}
+                MOV     R4, R0
+                MOV     R5, R1
+                MOV     R6, #0             
+                MOV     R7, #0             
+
+                LDRB    R2, [R4]
+                CMP     R2, #'-'
+                BNE     Sub_Check_B
+                MOV     R6, #1
+                ADD     R4, R4, #1
+
+Sub_Check_B
+                LDRB    R2, [R5]
+                CMP     R2, #'-'
+                BNE     Sub_Route
+                MOV     R7, #1
+                ADD     R5, R5, #1
+
+Sub_Route
+                CMP     R6, #0
+                BNE     Sub_A_Neg
+
+                CMP     R7, #0
+                BNE     Sub_Pos_Neg
+                MOV     R0, R4
+                MOV     R1, R5
+                BL      BIG_SUB
+                B       Sub_End
+Sub_Pos_Neg
+                MOV     R0, R4
+                MOV     R1, R5
+                BL      ABS_ADD
+                B       Sub_End
+Sub_A_Neg
+                CMP     R7, #0
+                BNE     Sub_Neg_Neg
+                MOV     R0, R4
+                MOV     R1, R5
+                BL      ABS_ADD
+                LDRB    R2, [R0]
+                CMP     R2, #'0'
+                BNE     Sub_Apply_Minus
+                LDRB    R2, [R0, #1]
+                CMP     R2, #0
+                BEQ     Sub_End
+Sub_Apply_Minus
+                SUB     R0, R0, #1
+                MOV     R2, #'-'
+                STRB    R2, [R0]
+                B       Sub_End
+Sub_Neg_Neg
+                MOV     R0, R5
+                MOV     R1, R4
+                BL      BIG_SUB
+Sub_End
+                POP     {R4-R9, PC}
+
                 END

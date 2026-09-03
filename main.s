@@ -7,7 +7,7 @@
                 IMPORT  SHELL_READ_LINE
                 IMPORT  ARENA_INIT
                 IMPORT  STR_NORMALIZE
-                IMPORT  ABS_DIV
+                IMPORT  SIGNED_MUL     
 
 __main
                 BL      UART_INIT
@@ -16,14 +16,14 @@ __main
                 LDR     R0, =Boot_Msg
                 BL      PRINT_STR
 
-                LDR     R0, =Num_987654
-                LDR     R1, =Num_12
-                BL      ABS_DIV            
+                LDR     R0, =Num_Neg99
+                LDR     R1, =Num_5
+                BL      SIGNED_MUL         
                 
                 BL      PRINT_STR          
                 LDR     R0, =Newline_Msg
                 BL      PRINT_STR
-
+				
 OS_Shell_Loop
                 LDR     R0, =Prompt_Msg
                 BL      PRINT_STR
@@ -48,8 +48,8 @@ OS_Shell_Loop
 CMD_Buffer      SPACE   64
 
                 AREA    |.rodata|, DATA, READONLY, ALIGN=2
-Num_987654      DCB     "987654", 0
-Num_12          DCB     "12", 0
+Num_Neg99       DCB     "-99", 0
+Num_5           DCB     "5", 0
 Boot_Msg        DCB     "StackOS v1.0 Initialized", 0x0D, 0x0A, 0
 Prompt_Msg      DCB     "StackOS> ", 0
 Echo_Msg        DCB     "Command: ", 0
