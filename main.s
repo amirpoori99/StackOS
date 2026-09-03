@@ -1,28 +1,26 @@
-				AREA    |.text|, CODE, READONLY
+
+                AREA    |.text|, CODE, READONLY
                 THUMB
                 EXPORT  __main
                 IMPORT  UART_INIT
                 IMPORT  PRINT_STR
                 IMPORT  SHELL_READ_LINE
                 IMPORT  ARENA_INIT
-                IMPORT  ARENA_ALLOC
                 IMPORT  STR_NORMALIZE
-                IMPORT  MATH_PUSH
-                IMPORT  MATH_POP
-                IMPORT  ABS_ADD
+                IMPORT  BIG_SUB
 
 __main
                 BL      UART_INIT
                 BL      ARENA_INIT
-
+                
                 LDR     R0, =Boot_Msg
                 BL      PRINT_STR
 
-                LDR     R0, =Num_9999
-                LDR     R1, =Num_1
-                BL      ABS_ADD           
+                LDR     R0, =Num_5
+                LDR     R1, =Num_1000
+                BL      BIG_SUB            
                 
-                BL      PRINT_STR        
+                BL      PRINT_STR          
                 LDR     R0, =Newline_Msg
                 BL      PRINT_STR
 
@@ -50,13 +48,14 @@ OS_Shell_Loop
 CMD_Buffer      SPACE   64
 
                 AREA    |.rodata|, DATA, READONLY, ALIGN=2
+
+Num_5           DCB     "5", 0
+Num_1000        DCB     "1000", 0
+
 Boot_Msg        DCB     "StackOS v1.0 Initialized", 0x0D, 0x0A, 0
 Prompt_Msg      DCB     "StackOS> ", 0
 Echo_Msg        DCB     "Command: ", 0
 Newline_Msg     DCB     0x0D, 0x0A, 0
-
-Num_9999        DCB     "9999", 0
-Num_1           DCB     "1", 0
                 ALIGN
 
                 END
