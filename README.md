@@ -429,7 +429,6 @@ For questions, bug reports, or collaboration:
 - **GitHub Issues:** `https://github.com/amirpoori99/StackOS/issues`
 - **Email:** `amirpoori99@gmail.com`
 
-> Replace the placeholder GitHub username and email address before publishing the repository.
 
 ---
 
