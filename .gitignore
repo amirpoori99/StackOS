@@ -1,0 +1,39 @@
+# Keil uVision project files
+*.uvoptx
+*.uvguix
+*.uvgui.*
+*.scvd
+*.dbg*
+*.crf
+*.d
+*.o
+*.axf
+*.htm
+*.lnp
+*.lst
+*.map
+*.dep
+*.i
+*.sct
+*.scr
+*.dbgconf
+
+# Build output folders
+Objects/
+Listings/
+DebugConfig/
+Output/
+*.bak
+*.tmp
+
+# User-specific settings
+*.uvopt
+*.uvguix
+*.uvproj.*
+*.user
+
+# Compiled binaries
+*.elf
+*.hex
+*.bin
+*.axf
