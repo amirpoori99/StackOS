@@ -1,4 +1,3 @@
-
 				AREA    |.text|, CODE, READONLY
                 THUMB
                 EXPORT  __main
@@ -7,22 +6,22 @@
                 IMPORT  SHELL_READ_LINE
                 IMPORT  ARENA_INIT
                 IMPORT  ARENA_ALLOC
+                IMPORT  STR_NORMALIZE
+                IMPORT  MATH_PUSH
+                IMPORT  MATH_POP
 
 __main
                 BL      UART_INIT
                 BL      ARENA_INIT
 
-                ; --- ??? ??? ????? ????? ---
-                MOV     R0, #10
-                BL      ARENA_ALLOC
-                ; ?? ????? R0 ?? ?? ?????? ????? ???? (????? ???)
-
-                MOV     R0, #30
-                BL      ARENA_ALLOC
-                ; ?? ????? R0 ?? ????? ???? (???? 0x0A ????? ?? ????? ??? ????)
-
-                ; ---------------------------
-
+                LDR     R4, =0xAAAA
+                LDR     R5, =0xBBBB
+                
+                LDR     R0, =Test_Dummy_Str 
+                BL      MATH_PUSH      
+                
+                BL      MATH_POP           
+				
                 LDR     R0, =Boot_Msg
                 BL      PRINT_STR
 
@@ -36,8 +35,11 @@ OS_Shell_Loop
 
                 LDR     R0, =Echo_Msg
                 BL      PRINT_STR
+
                 LDR     R0, =CMD_Buffer
-                BL      PRINT_STR
+                BL      STR_NORMALIZE      
+                BL      PRINT_STR          
+                
                 LDR     R0, =Newline_Msg
                 BL      PRINT_STR
 
@@ -45,6 +47,7 @@ OS_Shell_Loop
 
                 AREA    |.data|, DATA, READWRITE, ALIGN=3
 CMD_Buffer      SPACE   64
+Test_Dummy_Str  DCB     "999", 0
 
                 AREA    |.rodata|, DATA, READONLY, ALIGN=2
 Boot_Msg        DCB     "StackOS v1.0 Initialized", 0x0D, 0x0A, 0
