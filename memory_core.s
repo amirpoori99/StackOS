@@ -1,8 +1,8 @@
-
-                AREA    |.text|, CODE, READONLY
+				AREA    |.text|, CODE, READONLY
                 THUMB
                 EXPORT  ARENA_INIT
                 EXPORT  ARENA_ALLOC
+                EXPORT  MATH_INIT
                 EXPORT  MATH_PUSH
                 EXPORT  MATH_POP
 
@@ -15,42 +15,36 @@ ARENA_INIT
 ARENA_ALLOC
                 PUSH    {R4, R5, LR}
                 MOV     R4, R0             
-
                 LDR     R1, =Arena_Ptr
                 LDR     R2, [R1]           
-
                 LDR     R3, =Arena_Block
                 ADD     R3, R3, #2048      
-
                 ADD     R5, R2, R4
-
                 CMP     R5, R3
                 BHI     Arena_Overflow
-
                 STR     R5, [R1]
-
                 MOV     R0, R2
-
                 POP     {R4, R5, PC}
 
 Arena_Overflow
                 MOV     R0, #0             
                 POP     {R4, R5, PC}
 
+MATH_INIT
+                LDR     R1, =Stack_Count
+                MOV     R0, #0
+                STRB    R0, [R1]
+                BX      LR
+
 MATH_PUSH
                 PUSH    {R4-R6, LR}        
                 LDR     R1, =Stack_Count
                 LDRB    R2, [R1]           
-
                 CMP     R2, #64            
                 BEQ     Push_Overflow
-
                 LDR     R3, =Math_Stack
                 LSL     R4, R2, #2         
-
-                ; ??????? ???? (R0) ?? ???? ??????? ?? ????
                 STR     R0, [R3, R4]       
-
                 ADD     R2, R2, #1         
                 STRB    R2, [R1]           
                 MOV     R0, #1             
@@ -64,18 +58,13 @@ MATH_POP
                 PUSH    {R4-R6, LR}        
                 LDR     R1, =Stack_Count
                 LDRB    R2, [R1]
-
                 CMP     R2, #0             
                 BEQ     Pop_Underflow
-
                 SUB     R2, R2, #1         
                 STRB    R2, [R1]           
-
                 LDR     R3, =Math_Stack
                 LSL     R4, R2, #2         
-
                 LDR     R0, [R3, R4]       
-
                 POP     {R4-R6, PC}
 
 Pop_Underflow
@@ -86,7 +75,6 @@ Pop_Underflow
                 ALIGN
 Arena_Block     SPACE   2048               
 Arena_Ptr       SPACE   4                  
-
 Math_Stack      SPACE   256                
 Stack_Count     SPACE   1                  
                 ALIGN

@@ -6,8 +6,7 @@
                 IMPORT  PRINT_STR
                 IMPORT  SHELL_READ_LINE
                 IMPORT  ARENA_INIT
-                IMPORT  STR_NORMALIZE
-                IMPORT  SIGNED_MUL     
+                IMPORT  RPN_EVAL
 
 __main
                 BL      UART_INIT
@@ -16,15 +15,22 @@ __main
                 LDR     R0, =Boot_Msg
                 BL      PRINT_STR
 
-                LDR     R0, =Num_Neg99
-                LDR     R1, =Num_5
-                BL      SIGNED_MUL         
-                
-                BL      PRINT_STR          
-                LDR     R0, =Newline_Msg
-                BL      PRINT_STR
-				
+                LDR     R0, =Equation_Test
+                LDR     R1, =CMD_Buffer
+Copy_Loop
+                LDRB    R2, [R0]
+                STRB    R2, [R1]
+                ADD     R0, R0, #1
+                ADD     R1, R1, #1
+                CMP     R2, #0
+                BNE     Copy_Loop
+
+                LDR     R0, =CMD_Buffer
+                BL      RPN_EVAL         
+
 OS_Shell_Loop
+                BL      ARENA_INIT         
+
                 LDR     R0, =Prompt_Msg
                 BL      PRINT_STR
 
@@ -32,15 +38,8 @@ OS_Shell_Loop
                 MOV     R1, #64
                 BL      SHELL_READ_LINE
 
-                LDR     R0, =Echo_Msg
-                BL      PRINT_STR
-
                 LDR     R0, =CMD_Buffer
-                BL      STR_NORMALIZE      
-                BL      PRINT_STR          
-                
-                LDR     R0, =Newline_Msg
-                BL      PRINT_STR
+                BL      RPN_EVAL          
 
                 B       OS_Shell_Loop
 
@@ -48,12 +47,9 @@ OS_Shell_Loop
 CMD_Buffer      SPACE   64
 
                 AREA    |.rodata|, DATA, READONLY, ALIGN=2
-Num_Neg99       DCB     "-99", 0
-Num_5           DCB     "5", 0
+Equation_Test   DCB     "10 20 + 5 *", 0
 Boot_Msg        DCB     "StackOS v1.0 Initialized", 0x0D, 0x0A, 0
 Prompt_Msg      DCB     "StackOS> ", 0
-Echo_Msg        DCB     "Command: ", 0
-Newline_Msg     DCB     0x0D, 0x0A, 0
                 ALIGN
 
                 END
