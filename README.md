@@ -506,7 +506,12 @@ Contributions are welcome. To contribute:
 For questions, bug reports, or collaboration:
 
 - **GitHub Issues:** `https://github.com/amirpoori99/StackOS/issues`
+<<<<<<< HEAD
 - **Email:** `amirpoori99@aut.ac.ir`
+=======
+- **Email:** `amirpoori99@gmail.com`
+
+>>>>>>> ca55271ade9211e6921ae7f25d8b35cb4bd30d37
 
 ---
 
