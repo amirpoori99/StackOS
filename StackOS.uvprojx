@@ -409,6 +409,11 @@
               <FileType>2</FileType>
               <FilePath>.\string_utils.s</FilePath>
             </File>
+            <File>
+              <FileName>math_basic.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\math_basic.s</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
