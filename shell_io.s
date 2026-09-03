@@ -1,4 +1,13 @@
-				AREA    |.text|, CODE, READONLY
+				GET     config.s           
+
+                MACRO
+$label          SEND_CHAR $char
+$label
+                MOV     R0, #$char
+                BL      UART_SEND
+                MEND
+
+                AREA    |.text|, CODE, READONLY
                 THUMB
                 EXPORT  UART_INIT
                 EXPORT  UART_SEND
@@ -8,35 +17,38 @@
 
 UART_INIT
                 PUSH    {R1, R2, LR}
-                LDR     R1, =0x40021018
-                LDR     R2, =0x00004005
+                LDR     R1, =RCC_APB2ENR
+                LDR     R2, =RCC_EN_VAL    
                 STR     R2, [R1]
-                LDR     R1, =0x40010804
-                LDR     R2, =0x444444B4
+                
+                LDR     R1, =GPIOA_CRH
+                LDR     R2, =GPIOA_CFG_VAL 
                 STR     R2, [R1]
-                LDR     R1, =0x40013800
-                LDR     R2, =0x0341
-                STR     R2, [R1, #0x08]
-                LDR     R2, =0x0000200C
-                STR     R2, [R1, #0x0C]
+                
+                LDR     R1, =USART1_BASE
+                LDR     R2, =USART_BAUD_VAL
+                STR     R2, [R1, #USART_BRR] 
+                
+                LDR     R2, =USART_CTRL_VAL
+                STR     R2, [R1, #USART_CR1] 
                 POP     {R1, R2, PC}
 
 UART_SEND
-                LDR     R1, =0x40013800
+                LDR     R1, =USART1_BASE
 Tx_Wait
-                LDR     R2, [R1, #0x00]
+                LDR     R2, [R1, #USART_SR] 
                 TST     R2, #0x80
                 BEQ     Tx_Wait
-                STRH    R0, [R1, #0x04]
+                STRH    R0, [R1, #USART_DR] 
                 BX      LR
 
 UART_RECEIVE
-                LDR     R1, =0x40013800
+                LDR     R1, =USART1_BASE
 Rx_Wait
-                LDR     R2, [R1, #0x00]
+                LDR     R2, [R1, #USART_SR] 
                 TST     R2, #0x20
                 BEQ     Rx_Wait
-                LDRH    R0, [R1, #0x04]
+                LDRH    R0, [R1, #USART_DR]  
                 BX      LR
 
 PRINT_STR
@@ -54,20 +66,23 @@ Print_End
 
 SHELL_READ_LINE
                 PUSH    {R4, R5, R6, LR}
-                MOV     R4, R0
-                MOV     R5, R1
-                MOV     R6, R0
+                MOV     R4, R0             
+                MOV     R5, R1             
+                MOV     R6, R0             
 Read_Loop
-                BL      UART_RECEIVE
-                CMP     R0, #0x0D          ; ????? ???? Enter
+                BL      UART_RECEIVE       
+
+                CMP     R0, #ASCII_ESC     
+                BEQ     Eat_Escape         
+                CMP     R0, #ASCII_CR      
                 BEQ     End_Read_Line
-                CMP     R0, #0x08          ; ????? ???? Backspace
+                CMP     R0, #ASCII_BACKSPACE 
                 BEQ     Handle_Backspace
-                
-                CMP     R0, #0x20          ; ????? ?????????? ?????? (Arrow/Tab)
-                BLT     Read_Loop          ; ?????? ????? ?????
-                
-                CMP     R5, #1             ; ????? ????? ????
+                CMP     R0, #ASCII_SPACE   
+                BLT     Read_Loop          
+                CMP     R0, #ASCII_MAX_PRINT 
+                BGT     Read_Loop          
+                CMP     R5, #1             
                 BLE     Read_Loop
                 
                 STRB    R0, [R4]
@@ -76,28 +91,26 @@ Read_Loop
                 SUB     R5, R5, #1
                 B       Read_Loop
 
+Eat_Escape
+                BL      UART_RECEIVE       
+                BL      UART_RECEIVE       
+                B       Read_Loop
+
 Handle_Backspace
                 CMP     R4, R6
                 BEQ     Read_Loop
-                
                 SUB     R4, R4, #1
                 ADD     R5, R5, #1
-                
-                MOV     R0, #0x08
-                BL      UART_SEND
-                MOV     R0, #0x20
-                BL      UART_SEND
-                MOV     R0, #0x08
-                BL      UART_SEND
+                SEND_CHAR ASCII_BACKSPACE  
+                SEND_CHAR ASCII_SPACE
+                SEND_CHAR ASCII_BACKSPACE
                 B       Read_Loop
 
 End_Read_Line
                 MOV     R0, #0
                 STRB    R0, [R4]
-                MOV     R0, #0x0D
-                BL      UART_SEND
-                MOV     R0, #0x0A
-                BL      UART_SEND
+                SEND_CHAR ASCII_CR         
+                SEND_CHAR ASCII_LF
                 POP     {R4, R5, R6, PC}
 
                 END

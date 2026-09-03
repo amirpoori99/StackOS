@@ -1,10 +1,13 @@
-				AREA    |.text|, CODE, READONLY
+				GET     config.s
+
+                AREA    |.text|, CODE, READONLY
                 THUMB
                 EXPORT  ARENA_INIT
                 EXPORT  ARENA_ALLOC
                 EXPORT  MATH_INIT
                 EXPORT  MATH_PUSH
                 EXPORT  MATH_POP
+                IMPORT  OOM_ExceptionHandler 
 
 ARENA_INIT
                 LDR     R0, =Arena_Block
@@ -18,7 +21,7 @@ ARENA_ALLOC
                 LDR     R1, =Arena_Ptr
                 LDR     R2, [R1]           
                 LDR     R3, =Arena_Block
-                ADD     R3, R3, #2048      
+                ADD     R3, R3, #ARENA_SIZE  
                 ADD     R5, R2, R4
                 CMP     R5, R3
                 BHI     Arena_Overflow
@@ -27,8 +30,7 @@ ARENA_ALLOC
                 POP     {R4, R5, PC}
 
 Arena_Overflow
-                MOV     R0, #0             
-                POP     {R4, R5, PC}
+                B       OOM_ExceptionHandler 
 
 MATH_INIT
                 LDR     R1, =Stack_Count
@@ -40,7 +42,7 @@ MATH_PUSH
                 PUSH    {R4-R6, LR}        
                 LDR     R1, =Stack_Count
                 LDRB    R2, [R1]           
-                CMP     R2, #64            
+                CMP     R2, #STACK_CAPACITY  
                 BEQ     Push_Overflow
                 LDR     R3, =Math_Stack
                 LSL     R4, R2, #2         
@@ -73,9 +75,9 @@ Pop_Underflow
 
                 AREA    |.data|, DATA, READWRITE
                 ALIGN
-Arena_Block     SPACE   2048               
+Arena_Block     SPACE   ARENA_SIZE         
 Arena_Ptr       SPACE   4                  
-Math_Stack      SPACE   256                
+Math_Stack      SPACE   STACK_MEM_SIZE     
 Stack_Count     SPACE   1                  
                 ALIGN
 
