@@ -1,14 +1,46 @@
-# StackOS
+<div align="center">
 
-**Bare-Metal ARM Cortex-M3 Assembly Project - A Stack-Based Calculator with BigInt Support**
+# ⚡ StackOS
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+### Bare-Metal ARM Cortex-M3 Assembly Calculator
+
+**A stack-based RPN calculator with arbitrary-precision integer arithmetic, built from the ground up in ARM assembly.**
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/Platform-ARM%20Cortex--M3-0091BD?logo=arm)](https://www.arm.com/architecture/cpu/cortex-m)
+[![MCU](https://img.shields.io/badge/Target-STM32F103RB-03234B?logo=stmicroelectronics)](https://www.st.com/en/microcontrollers-microprocessors/stm32f103rb.html)
+[![Assembly](https://img.shields.io/badge/Language-ARM%20Assembly-ED1C24?logo=arm)](https://developer.arm.com/documentation/ddi0403/latest/)
+[![IDE](https://img.shields.io/badge/IDE-Keil%20µVision-2E8B57)](https://www.keil.com/)
+[![Status](https://img.shields.io/badge/Status-Educational%20Project-6F42C1)](#project-phases)
+
+<br>
+
+> 🧠 **Think low-level. Build everything yourself.**
+>
+> StackOS turns an ARM Cortex-M3 into a self-contained command-line calculator,
+> with its own software stack, memory allocator, parser, and BigInt arithmetic engine.
+
+</div>
+
+---
+
+## ✨ At a Glance
+
+| 🧮 BigInt | 🧠 RPN Engine | 🗃️ Custom Memory | 🔌 Bare Metal | 🛡️ Defensive I/O | 📐 AAPCS |
+|:---:|:---:|:---:|:---:|:---:|:---:|
+| + − × ÷ | Tokenizer & parser | Arena allocator | No OS required | Input filtering | ABI-aware calls |
+
+> 🎯 **Project goal**
+> Build a complete calculator runtime in pure ARM assembly while exposing the fundamentals of memory management, calling conventions, parsing, arithmetic, and low-level I/O.
+
+---
+
 [![Platform](https://img.shields.io/badge/platform-ARM%20Cortex--M3-blue)](https://www.arm.com/)
 [![IDE](https://img.shields.io/badge/IDE-Keil%20uVision-green)](https://www.keil.com/)
 
 ---
 
-## Table of Contents
+## 📖 Table of Contents
 
 - [Overview](#overview)
 - [Key Features](#key-features)
@@ -29,7 +61,7 @@
 
 ---
 
-## Overview
+## 🧠 Overview
 
 **StackOS** is a bare-metal ARM assembly project that implements a stack-based calculator with arbitrary-precision integer arithmetic. It is designed for the **ARM Cortex-M3** architecture, specifically targeting the **STM32F103RB** microcontroller.
 
@@ -45,9 +77,12 @@ The project is intended as a hands-on exploration of low-level programming conce
 
 Rather than relying on high-level libraries, StackOS implements its core functionality directly in ARM assembly. This requires explicit management of registers, memory, stacks, communication interfaces, and arithmetic operations.
 
+> 💡 **Why this project is interesting:** every major subsystem is intentionally exposed. You can inspect how a number moves through the parser, software stack, allocator, arithmetic engine, and UART output without hiding the underlying operations behind a runtime or standard library.
+
+
 ---
 
-## Key Features
+## ✨ Key Features
 
 ### Interactive Command Shell
 
@@ -84,51 +119,40 @@ Rather than relying on high-level libraries, StackOS implements its core functio
 
 ---
 
-## Architecture
+## 🏗️ Architecture
 
-The project is organized into several layers, from the user-facing command shell down to the hardware interface:
+The project is organized as a layered pipeline, moving from user input down to the hardware interface:
+
+```mermaid
+flowchart TD
+    A[Command Shell<br/>main.s + shell_io.s] --> B[RPN Parser & Tokenizer<br/>rpn_parser.s]
+    B --> C[Algebraic Router<br/>SIGNED_ADD / SIGNED_SUB / ...]
+    C --> D[BigInt Core ALUs<br/>ABS_ADD / ABS_SUB / ABS_MUL / ABS_DIV]
+    D --> E[Software Math Stack<br/>MATH_PUSH / MATH_POP]
+    E --> F[Arena Allocator<br/>ARENA_INIT / ARENA_ALLOC]
+    F --> G[Hardware Layer<br/>startup.s + shell_io.s]
+```
+
+<details>
+<summary>📦 Text-only architecture view</summary>
 
 ```text
-┌─────────────────────────────────────────────┐
-│              Command Shell (CLI)            │
-│             main.s + shell_io.s             │
-└──────────────────────┬──────────────────────┘
-                       │
-┌──────────────────────▼──────────────────────┐
-│             RPN Parser & Tokenizer           │
-│                  rpn_parser.s                 │
-└──────────────────────┬──────────────────────┘
-                       │
-┌──────────────────────▼──────────────────────┐
-│               Algebraic Router               │
-│       SIGNED_ADD, SIGNED_SUB, etc.           │
-└──────────────────────┬──────────────────────┘
-                       │
-┌──────────────────────▼──────────────────────┐
-│                 BigInt Core                  │
-│       ABS_ADD, ABS_SUB, ABS_MUL, ABS_DIV     │
-└──────────────────────┬──────────────────────┘
-                       │
-┌──────────────────────▼──────────────────────┐
-│             Software Math Stack              │
-│              MATH_PUSH / MATH_POP            │
-└──────────────────────┬──────────────────────┘
-                       │
-┌──────────────────────▼──────────────────────┐
-│              Arena Allocator                 │
-│             ARENA_INIT / ALLOC               │
-└──────────────────────┬──────────────────────┘
-                       │
-┌──────────────────────▼──────────────────────┐
-│               Hardware Layer                │
-│             UART + Startup Code             │
-│              startup.s + shell_io.s          │
-└─────────────────────────────────────────────┘
+Command Shell → RPN Parser → Algebraic Router → BigInt Core
+      ↓               ↓              ↓               ↓
+   UART I/O       Tokenization   Sign handling   +  −  ×  ÷
+                                                      ↓
+                                         Software Math Stack
+                                                      ↓
+                                            Arena Allocator
+                                                      ↓
+                                      UART / Startup / Hardware
 ```
+
+</details>
 
 ---
 
-## Project Structure
+## 📁 Project Structure
 
 ```text
 StackOS/
@@ -147,7 +171,7 @@ StackOS/
 
 ---
 
-## Project Phases
+## 🧩 Project Phases
 
 | Phase | Title | Focus | Score |
 |:-----:|---|---|:-----:|
@@ -168,7 +192,23 @@ StackOS/
 
 ---
 
-## Prerequisites
+## 🧰 Technology Stack
+
+<div align="center">
+
+| Layer | Technology |
+|:---|:---|
+| CPU Architecture | **ARM Cortex-M3** |
+| Target MCU | **STM32F103RB** |
+| Language | **ARM Assembly** |
+| Toolchain | **ARM Compiler 6** |
+| IDE / Debugger | **Keil µVision 5** |
+| Interface | **UART (polling)** |
+| Execution Model | **Bare metal / no operating system** |
+
+</div>
+
+## 🛠️ Prerequisites
 
 ### Software
 
@@ -184,7 +224,7 @@ StackOS/
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
 ### 1. Clone the Repository
 
@@ -255,7 +295,7 @@ Expected output:
 
 ---
 
-## Building the Project
+## 🔧 Building the Project
 
 ### Using Keil µVision
 
@@ -276,7 +316,7 @@ armlink --cpu=Cortex-M3 *.o --map --symbols --info=summary --output=StackOS.axf
 
 ---
 
-## Testing and Debugging
+## 🧪 Testing and Debugging
 
 ### UART #1 Terminal
 
@@ -305,7 +345,7 @@ armlink --cpu=Cortex-M3 *.o --map --symbols --info=summary --output=StackOS.axf
 
 ---
 
-## Code Standards (AAPCS)
+## 📐 Code Standards (AAPCS)
 
 The project follows the **ARM Architecture Procedure Call Standard (AAPCS)** for function interfaces and register preservation.
 
@@ -347,29 +387,68 @@ POP     {R4-R11, PC}
 
 ---
 
-## Usage Examples
+## 💻 Usage Examples
 
 After startup, the following prompt should appear:
 
+
 ```text
+╔══════════════════════════════════════════════╗
+║           Welcome to StackOS V1.0            ║
+╚══════════════════════════════════════════════╝
+
+StackOS> 10 20 + 5 *
+150
+
+StackOS> 999 999 *
+998001
+
+StackOS> -10 -5 *
+50
+
 StackOS>
 ```
 
 Enter an expression using **Reverse Polish Notation (RPN)** and press Enter.
 
-| User Input | Expected Output |
-|---|---:|
-| `12 34 +` | `46` |
-| `999 999 *` | `998001` |
-| `1000 5 -` | `995` |
-| `-10 -5 *` | `50` |
-| `100 3 /` | `33` |
+| User Input      | Expected Output                         |
+|---              |---:                                     |
+| `12 34 +`       | `46`                                    |
+| `999 999 *`     | `998001`                                |
+| `1000 5 -`      | `995`                                   |
+| `-10 -5 *`      | `50`                                    |
+| `100 3 /`       | `33`                                    |
 | `100 50 50 - /` | `Error: Division by zero is undefined.` |
-| `10 20 + 5 *` | `150` |
+| `10 20 + 5 *`   | `150`                                   |
+
+### 🔄 RPN Execution Flow
+
+```text
+Input:  10 20 + 5 *
+         │
+         ▼
+   ┌─────────────┐
+   │  Tokenizer  │  →  10 | 20 | + | 5 | *
+   └──────┬──────┘
+          ▼
+   ┌─────────────┐
+   │ Math Stack  │  →  [10, 20]
+   └──────┬──────┘
+          │ 10 + 20
+          ▼
+   ┌─────────────┐
+   │ BigInt ALU  │  →  [30, 5]
+   └──────┬──────┘
+          │ 30 × 5
+          ▼
+   ┌─────────────┐
+   │    Result   │  →  150
+   └─────────────┘
+```
 
 ---
 
-## License
+## 📜 License
 
 This project is licensed under the **MIT License**.
 
@@ -377,7 +456,7 @@ See the [`LICENSE`](LICENSE) file for the full license text.
 
 ---
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome. To contribute:
 
@@ -412,7 +491,7 @@ Contributions are welcome. To contribute:
 
 ---
 
-## Acknowledgments
+## 👏 Acknowledgments
 
 - **ARM** - for the ARM architecture and instruction set
 - **Keil** - for the µVision development environment
@@ -422,18 +501,16 @@ Contributions are welcome. To contribute:
 
 ---
 
-## Contact
+## 📫 Contact
 
 For questions, bug reports, or collaboration:
 
-- **GitHub Issues:** `https://github.com/your-username/StackOS/issues`
-- **Email:** `your-email@example.com`
-
-> Replace the placeholder GitHub username and email address before publishing the repository.
+- **GitHub Issues:** `https://github.com/amirpoori99/StackOS/issues`
+- **Email:** `amirpoori99@aut.ac.ir`
 
 ---
 
-## Further Reading
+## 📚 Further Reading
 
 - [ARM Architecture Reference Manual](https://developer.arm.com/documentation/ddi0403/latest/)
 - [AAPCS Specification](https://developer.arm.com/documentation/ihi0042/latest/)
