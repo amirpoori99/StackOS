@@ -10,7 +10,8 @@
                 IMPORT  BIG_SUB
 
 ABS_MUL
-                PUSH    {R4-R12, LR}
+
+                PUSH    {R4-R11, LR}
                 MOV     R4, R0
                 MOV     R5, R1
                 MOV     R0, R4
@@ -84,11 +85,11 @@ Trim_Loop_Mul
                 B       Trim_Loop_Mul
 End_Mul
                 MOV     R0, R10
-                POP     {R4-R12, PC}
+                POP     {R4-R11, PC}
 
 ABS_DIV
-                PUSH    {R4-R12, LR}
-                MOV     R4, R0
+				PUSH    {R4-R11, LR}
+				MOV     R4, R0
                 MOV     R5, R1
                 MOV     R0, R4
                 MOV     R1, R5
@@ -101,7 +102,7 @@ ABS_DIV
                 STRB    R1, [R0]
                 MOV     R1, #0
                 STRB    R1, [R0, #1]
-                POP     {R4-R12, PC}
+                POP     {R4-R11, PC}
 Check_Zero_Div
                 MOV     R0, R5
 Check_Zero_Loop
@@ -187,7 +188,7 @@ Trim_Loop_Div
                 B       Trim_Loop_Div
 End_Div_Trim
                 MOV     R0, R10
-                POP     {R4-R12, PC}
+                POP     {R4-R11, PC}
 Div_By_Zero_Error
                 MOV     R0, #2
                 BL      ARENA_ALLOC
@@ -195,7 +196,7 @@ Div_By_Zero_Error
                 STRB    R1, [R0]
                 MOV     R1, #0
                 STRB    R1, [R0, #1]
-                POP     {R4-R12, PC}
+                POP     {R4-R11, PC}
 
 SIGNED_MUL
                 PUSH    {R4-R8, LR}
