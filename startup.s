@@ -8,17 +8,23 @@ __initial_sp
 __Vectors
                 DCD     __initial_sp
                 DCD     Reset_Handler
+                DCD     NMI_Handler              
+                DCD     HardFault_Handler
 
                 AREA    |.text|, CODE, READONLY
                 THUMB
                 EXPORT  Reset_Handler
+                EXPORT  NMI_Handler                
+                EXPORT  HardFault_Handler  
                 IMPORT  __main
 
 Reset_Handler
                 LDR     R0, =__main
                 BX      R0
 
-Loop_Inf
-                B       Loop_Inf
+NMI_Handler   
+
+HardFault_Handler                                 
+                B       HardFault_Handler
 
                 END

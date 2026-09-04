@@ -22,10 +22,10 @@ ABS_MUL
                 MOV     R0, R6
                 ADD     R0, R0, R7
                 MOV     R8, R0
-                ADD     R0, R0, #1
+                ADD     R0, R0, #2         
                 BL      ARENA_ALLOC
-                MOV     R9, R0
-                MOV     R10, R9
+                ADD     R9, R0, #1   
+				MOV     R10, R9
                 MOV     R11, R8
                 MOV     R12, #'0'
 Format_Loop
@@ -114,9 +114,9 @@ Check_Zero_Loop
                 BL      STR_LEN
                 MOV     R6, R0
                 MOV     R0, R6
-                ADD     R0, R0, #2
+                ADD     R0, R0, #3       
                 BL      ARENA_ALLOC
-                MOV     R9, R0
+                ADD     R9, R0, #1         
                 MOV     R10, R9
                 MOV     R0, R5
                 BL      STR_LEN

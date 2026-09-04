@@ -48,11 +48,15 @@ OOM_ExceptionHandler
 CMD_Buffer      SPACE   CMD_BUF_SIZE        
 
                 AREA    |.rodata|, DATA, READONLY, ALIGN=2
-Boot_Msg        DCB     "StackOS v1.0 Initialized", ASCII_CR, ASCII_LF, 0
+
+Boot_Msg        DCB     "SID: 40232011", ASCII_CR, ASCII_LF      
+                DCB     "StackOS v1.0 Initialized", ASCII_CR, ASCII_LF, 0
+
 Prompt_Msg      DCB     "StackOS> ", 0
 
 Msg_OOM         DCB     "Error: Out of Memory (OOM)! Arena limit reached.", ASCII_CR, ASCII_LF
-                DCB     "Hint: Increase ARENA_SIZE in config.s", ASCII_CR, ASCII_LF, 0
-                ALIGN
+                DCB     "Hint: Reduce operand size or expression length.", ASCII_CR, ASCII_LF, 0
+				
+			 ALIGN
 
                 END

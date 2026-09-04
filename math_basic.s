@@ -24,13 +24,14 @@ ABS_ADD
                 B       Do_Alloc_Add
 Max_A
                 MOV     R8, R6
+
 Do_Alloc_Add
-                ADD     R8, R8, #2         
-                MOV     R0, R8
+                ADD     R8, R8, #2
+                ADD     R0, R8, #1         
                 BL      ARENA_ALLOC
-                MOV     R9, R0             
+                ADD     R9, R0, #1         
                 ADD     R10, R9, R8
-                SUB     R10, R10, #1       
+                SUB     R10, R10, #1			
                 MOV     R0, #0
                 STRB    R0, [R10]          
                 SUB     R10, R10, #1       
@@ -139,7 +140,7 @@ Setup_Sub
                 MOV     R0, R6
                 ADD     R0, R0, #2
                 BL      ARENA_ALLOC
-                MOV     R9, R0             
+                ADD     R9, R0, #1       
                 ADD     R10, R9, R6
                 MOV     R0, #0
                 STRB    R0, [R10]          
