@@ -88,15 +88,15 @@ End_Mul
                 POP     {R4-R11, PC}
 
 ABS_DIV
-				PUSH    {R4-R11, LR}
-				MOV     R4, R0
-                MOV     R5, R1
+                PUSH    {R4-R11, LR}      
+                MOV     R4, R0        
+                MOV     R5, R1            
                 MOV     R0, R4
                 MOV     R1, R5
                 BL      STR_CMP_MAG
                 CMP     R0, #2
                 BNE     Check_Zero_Div
-                MOV     R0, #2
+                MOV     R0, #2              
                 BL      ARENA_ALLOC
                 MOV     R1, #'0'
                 STRB    R1, [R0]
@@ -104,7 +104,7 @@ ABS_DIV
                 STRB    R1, [R0, #1]
                 POP     {R4-R11, PC}
 Check_Zero_Div
-                MOV     R0, R5
+                MOV     R0, R5             
 Check_Zero_Loop
                 LDRB    R1, [R0], #1
                 CMP     R1, #0
@@ -113,22 +113,19 @@ Check_Zero_Loop
                 BEQ     Check_Zero_Loop
                 MOV     R0, R4
                 BL      STR_LEN
-                MOV     R6, R0
-                MOV     R0, R6
-                ADD     R0, R0, #3       
+                MOV     R6, R0              
+                ADD     R0, R6, #2          
                 BL      ARENA_ALLOC
-                ADD     R9, R0, #1         
-                MOV     R10, R9
+                ADD     R9, R0, #1
+                MOV     R10, R9           
                 MOV     R0, R5
                 BL      STR_LEN
-                MOV     R7, R0
-                MOV     R0, R6
-                ADD     R0, R0, R7
-                ADD     R0, R0, #2
+                MOV     R7, R0            
+                ADD     R0, R6, #1        
                 BL      ARENA_ALLOC
-                MOV     R8, R0
+                MOV     R8, R0            
                 MOV     R0, #0
-Copy_Div_Loop
+Copy_Div_Loop                              
                 LDRB    R1, [R5, R0]
                 STRB    R1, [R8, R0]
                 ADD     R0, R0, #1
@@ -137,7 +134,7 @@ Copy_Div_Loop
                 MOV     R11, R6
                 SUB     R11, R11, R7
                 CMP     R11, #0
-                BLE     End_Pad_Zero
+                BLE     End_Pad_Zero    
                 MOV     R12, #'0'
 Pad_Zero_Loop
                 STRB    R12, [R8, R0]
@@ -147,37 +144,37 @@ Pad_Zero_Loop
                 BGT     Pad_Zero_Loop
 End_Pad_Zero
                 MOV     R1, #0
-                STRB    R1, [R8, R0]
-                MOV     R6, R0
+                STRB    R1, [R8, R0]   
+                MOV     R6, R0          
 Div_Sliding_Window_Loop
                 CMP     R6, R7
-                BLT     End_Div
-                MOV     R11, #0
+                BLT     End_Div          
+                MOV     R11, #0          
 Repeated_Sub_Loop
                 MOV     R0, R4
                 MOV     R1, R8
                 BL      STR_CMP_MAG
                 CMP     R0, #2
-                BEQ     Save_Quotient_Digit
-                MOV     R0, R4
+                BEQ     Save_Quotient_Digit 
+                MOV     R0, R4           
                 MOV     R1, R8
-                BL      BIG_SUB
-                MOV     R4, R0
+                BL      BIG_SUB            
+                MOV     R4, R0            
                 ADD     R11, R11, #1
                 B       Repeated_Sub_Loop
 Save_Quotient_Digit
                 ADD     R11, R11, #'0'
                 STRB    R11, [R10]
                 ADD     R10, R10, #1
-                SUB     R6, R6, #1
+                SUB     R6, R6, #1        
                 MOV     R0, #0
                 STRB    R0, [R8, R6]
                 B       Div_Sliding_Window_Loop
 End_Div
                 MOV     R0, #0
-                STRB    R0, [R10]
+                STRB    R0, [R10]          
                 MOV     R10, R9
-Trim_Loop_Div
+Trim_Loop_Div                             
                 LDRB    R0, [R10]
                 CMP     R0, #'0'
                 BNE     End_Div_Trim
@@ -190,13 +187,17 @@ End_Div_Trim
                 MOV     R0, R10
                 POP     {R4-R11, PC}
 Div_By_Zero_Error
-                MOV     R0, #2
+                MOV     R0, #3             
                 BL      ARENA_ALLOC
                 MOV     R1, #'E'
-                STRB    R1, [R0]
-                MOV     R1, #0
                 STRB    R1, [R0, #1]
+                MOV     R1, #0
+                STRB    R1, [R0, #2]
+                ADD     R0, R0, #1
                 POP     {R4-R11, PC}
+
+
+
 
 SIGNED_MUL
                 PUSH    {R4-R8, LR}
@@ -245,7 +246,7 @@ SIGNED_DIV
                 CMP     R2, #'-'
                 BNE     Check_Sign_B_Div
                 MOV     R6, #1
-                ADD     R4, R4, #1
+                ADD     R4, R4, #1   
 Check_Sign_B_Div
                 LDRB    R2, [R5]
                 CMP     R2, #'-'
@@ -253,20 +254,20 @@ Check_Sign_B_Div
                 MOV     R7, #1
                 ADD     R5, R5, #1
 Determine_Sign_Div
-                EOR     R8, R6, R7
+                EOR     R8, R6, R7       
                 MOV     R0, R4
                 MOV     R1, R5
-                BL      ABS_DIV
+                BL      ABS_DIV            
                 CMP     R8, #1
                 BNE     End_Signed_Div
-                LDRB    R2, [R0]
+                LDRB    R2, [R0]           
                 CMP     R2, #'0'
                 BNE     Apply_Minus_Div
                 LDRB    R2, [R0, #1]
                 CMP     R2, #0
                 BEQ     End_Signed_Div
 Apply_Minus_Div
-                SUB     R0, R0, #1
+                SUB     R0, R0, #1        
                 MOV     R2, #'-'
                 STRB    R2, [R0]
 End_Signed_Div
