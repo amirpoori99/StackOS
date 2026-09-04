@@ -205,7 +205,7 @@ Result_Is_Zero
                 POP     {R4-R11, PC}
 
 SIGNED_ADD
-                PUSH    {R4-R9, LR}
+                PUSH    {R4-R7, LR}
                 MOV     R4, R0
                 MOV     R5, R1
                 MOV     R6, #0             
@@ -257,10 +257,10 @@ Add_Apply_Minus
                 MOV     R2, #'-'
                 STRB    R2, [R0]
 Add_End
-                POP     {R4-R9, PC}
+                POP     {R4-R7, PC}
 
 SIGNED_SUB
-                PUSH    {R4-R9, LR}
+                PUSH    {R4-R7, LR}
                 MOV     R4, R0
                 MOV     R5, R1
                 MOV     R6, #0             
@@ -312,6 +312,6 @@ Sub_Neg_Neg
                 MOV     R1, R4
                 BL      BIG_SUB
 Sub_End
-                POP     {R4-R9, PC}
+                POP     {R4-R7, PC}
 
                 END
