@@ -37,7 +37,7 @@ UART_SEND
                 LDR     R1, =USART1_BASE
 Tx_Wait
                 LDR     R2, [R1, #USART_SR] 
-                TST     R2, #0x80
+                TST     R2, #USART_SR_TXE     
                 BEQ     Tx_Wait
                 STRH    R0, [R1, #USART_DR] 
                 BX      LR
@@ -46,7 +46,7 @@ UART_RECEIVE
                 LDR     R1, =USART1_BASE
 Rx_Wait
                 LDR     R2, [R1, #USART_SR] 
-                TST     R2, #0x20
+                TST     R2, #USART_SR_RXNE
                 BEQ     Rx_Wait
                 LDRH    R0, [R1, #USART_DR]  
                 BX      LR
@@ -78,6 +78,8 @@ Read_Loop
                 BEQ     End_Read_Line
                 CMP     R0, #ASCII_BACKSPACE 
                 BEQ     Handle_Backspace
+                CMP     R0, #ASCII_DEL        
+                BEQ     Handle_Backspace      
                 CMP     R0, #ASCII_SPACE   
                 BLT     Read_Loop          
                 CMP     R0, #ASCII_MAX_PRINT 

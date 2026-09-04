@@ -4,7 +4,8 @@ STACK_CAPACITY      EQU     64
 STACK_MEM_SIZE      EQU     STACK_CAPACITY * 4
 CMD_MAX_LEN         EQU     255         
 CMD_BUF_SIZE        EQU     256         
-
+CPU_STACK_SIZE      EQU     0x400 
+	
 ; --- Hardware Peripheral Addresses ---
 RCC_APB2ENR         EQU     0x40021018
 GPIOA_CRH           EQU     0x40010804
@@ -15,6 +16,10 @@ USART_SR            EQU     0x00
 USART_DR            EQU     0x04
 USART_BRR           EQU     0x08
 USART_CR1           EQU     0x0C
+
+; --- USART Status Flags ---
+USART_SR_TXE        EQU     0x80       
+USART_SR_RXNE       EQU     0x20      
 
 ; --- Hardware Configuration Values ---
 RCC_EN_VAL          EQU     0x00004005  
@@ -29,5 +34,12 @@ ASCII_LF            EQU     0x0A
 ASCII_ESC           EQU     0x1B        
 ASCII_SPACE         EQU     0x20
 ASCII_MAX_PRINT     EQU     0x7E        
-
+ASCII_DEL           EQU     0x7F     
+	
+; --- Test ---
+STACK_TEST_LINE     EQU     32 
+STACK_TEST_PREFILL  EQU     3 
+	
                     END
+						
+						

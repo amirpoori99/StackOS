@@ -1,5 +1,7 @@
-				AREA    STACK, NOINIT, READWRITE, ALIGN=3
-Stack_Mem       SPACE   0x400
+                GET     config.s
+                AREA    STACK, NOINIT, READWRITE, ALIGN=3
+Stack_Mem       SPACE   CPU_STACK_SIZE
+
 __initial_sp
 
                 AREA    RESET, DATA, READONLY
