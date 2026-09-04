@@ -18,9 +18,17 @@
 $label          POP_AND_CHECK $reg
 $label
                 BL      MATH_POP
-                CMN     R0, #1
-                BEQ.W   Syntax_Error_Handler  
+                CMN     R0, #1              
+                BEQ.W   Syntax_Error_Handler   
                 MOV     $reg, R0
+                MEND
+
+                MACRO
+$label          PUSH_AND_CHECK
+$label
+                BL      MATH_PUSH
+                CMN     R0, #1
+                BEQ.W   Stack_Overflow_Handler
                 MEND
 
 ; Register map:
@@ -49,7 +57,7 @@ Start_Token
 Find_Token_End
                 LDRB    R5, [R4]
                 CMP     R5, #0
-                BEQ     Process_Token        
+                BEQ     Process_Token           
                 CMP     R5, #ASCII_SPACE
                 BEQ     Cut_Token
                 ADD     R4, R4, #1
@@ -57,13 +65,13 @@ Find_Token_End
 Cut_Token
                 MOV     R5, #0
                 STRB    R5, [R4]               
-                ADD     R4, R4, #1            
+                ADD     R4, R4, #1             
 
 Process_Token
                 LDRB    R5, [R6]
                 LDRB    R7, [R6, #1]
                 CMP     R7, #0
-                BNE     Is_Number              
+                BNE     Is_Number               
                 CMP     R5, #'+'
                 BEQ     Op_Add
                 CMP     R5, #'-'
@@ -72,7 +80,7 @@ Process_Token
                 BEQ     Op_Mul
                 CMP     R5, #'/'
                 BEQ     Op_Div
-                                               
+                                             
 Is_Number
                 MOV     R8, R6
                 LDRB    R9, [R8]
@@ -94,17 +102,17 @@ Check_Digits
                 B       Check_Digits
 Validation_Done
                 MOV     R0, R6
-                BL      STR_NORMALIZE          
-                BL      MATH_PUSH             
+                BL      STR_NORMALIZE         
+                PUSH_AND_CHECK                
                 B       Tokenize_Loop
 
 Op_Add
                 POP_AND_CHECK R8               
-                POP_AND_CHECK R9       
+                POP_AND_CHECK R9            
                 MOV     R0, R9
                 MOV     R1, R8
                 BL      SIGNED_ADD
-                BL      MATH_PUSH
+                PUSH_AND_CHECK                
                 B       Tokenize_Loop
 
 Op_Sub
@@ -112,8 +120,8 @@ Op_Sub
                 POP_AND_CHECK R9
                 MOV     R0, R9
                 MOV     R1, R8
-                BL      SIGNED_SUB             
-                BL      MATH_PUSH
+                BL      SIGNED_SUB           
+                PUSH_AND_CHECK
                 B       Tokenize_Loop
 
 Op_Mul
@@ -122,23 +130,23 @@ Op_Mul
                 MOV     R0, R9
                 MOV     R1, R8
                 BL      SIGNED_MUL
-                BL      MATH_PUSH
+                PUSH_AND_CHECK
                 B       Tokenize_Loop
 
 Op_Div
-                POP_AND_CHECK R8            
-                POP_AND_CHECK R9              
-                LDRB    R2, [R8]             
-                CMP     R2, #'0'
-                BNE     Safe_To_Divide
+                POP_AND_CHECK R8               
+                POP_AND_CHECK R9               
+                LDRB    R2, [R8]               
+                CMP     R2, #'0'              
+                BNE     Safe_To_Divide         
                 LDRB    R3, [R8, #1]
                 CMP     R3, #0
                 BEQ.W   Math_Error_Handler
 Safe_To_Divide
                 MOV     R0, R9
                 MOV     R1, R8
-                BL      SIGNED_DIV            
-                BL      MATH_PUSH
+                BL      SIGNED_DIV           
+                PUSH_AND_CHECK
                 B       Tokenize_Loop
 
 Syntax_Error_Handler
@@ -148,16 +156,20 @@ Syntax_Error_Handler
 Math_Error_Handler
                 LDR     R0, =Msg_MathErr
                 BL      PRINT_STR
+                B       System_Recovery
+Stack_Overflow_Handler
+                LDR     R0, =Msg_StackOvf
+                BL      PRINT_STR
 System_Recovery
-                BL      MATH_INIT              
-                POP     {R4-R9, PC}
+                BL      MATH_INIT             
+                POP     {R4-R9, PC}            
 
 RPN_Finished
-                BL      MATH_POP               
-                CMN     R0, #1
-                BEQ     Empty_Line          
-                MOV     R5, R0
                 BL      MATH_POP                
+                CMN     R0, #1
+                BEQ     Empty_Line           
+                MOV     R5, R0
+                BL      MATH_POP              
                 CMN     R0, #1
                 BNE.W   Syntax_Error_Handler   
                 MOV     R0, R5
@@ -170,6 +182,7 @@ Empty_Line
                 AREA    |.rodata|, DATA, READONLY, ALIGN=2
 Newline_RPN     DCB     ASCII_CR, ASCII_LF, 0
 Msg_SyntaxErr   DCB     "Error: Invalid syntax.", ASCII_CR, ASCII_LF, 0
+Msg_StackOvf    DCB     "Error: Stack overflow.", ASCII_CR, ASCII_LF, 0
 Msg_MathErr     DCB     "Error: Division by zero is undefined.", ASCII_CR, ASCII_LF, 0
                 ALIGN
                 END
